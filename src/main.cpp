@@ -1,21 +1,28 @@
-/*4.ADC实验*/
+/*5.PWM实验*/
 #include <Arduino.h>
 
-#define ANALOG_PIN 0
+#define LED_GPIO 2
+#define PWM1_CHANNEL 0
+#define PWM1_RES 10		//分辨率
+#define PWM1_FREQ 1000	//频率
 
 void setup()
 {
-	// put your setup code here, to run once:
-	Serial.begin(115200); // 将UART0的波特率初始化为115200
-	Serial.println("ADC Demo!");
-
+	ledcAttachPin(LED_GPIO,PWM1_CHANNEL);
+	ledcSetup(PWM1_CHANNEL,PWM1_FREQ,PWM1_RES);
 }
 
-int analogValue;
+int pwm1DutyCycle;
 void loop()
 {
-	analogValue = analogRead(ANALOG_PIN);
-	Serial.print("ADC value on Pin(0) is ");
-	Serial.println(analogValue);
-	delay(1000);
+	while(pwm1DutyCycle < 1023)
+	{
+		ledcWrite(PWM1_CHANNEL,pwm1DutyCycle++);
+		delay(1);
+	}
+	while(pwm1DutyCycle > 0)
+	{
+		ledcWrite(PWM1_CHANNEL,pwm1DutyCycle--);
+		delay(1);
+	}
 }
