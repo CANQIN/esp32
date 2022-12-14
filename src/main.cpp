@@ -1,21 +1,21 @@
-/*3.串口实验*/
+/*4.ADC实验*/
 #include <Arduino.h>
+
+#define ANALOG_PIN 0
 
 void setup()
 {
 	// put your setup code here, to run once:
 	Serial.begin(115200); // 将UART0的波特率初始化为115200
+	Serial.println("ADC Demo!");
+
 }
 
-int recData;
+int analogValue;
 void loop()
 {
-	// 收到什么发送什么
-	if (Serial.available())
-	{
-		// 读取一个字节
-		recData = Serial.read();
-		Serial.print("received: ");
-		Serial.println(recData, HEX);
-	}
+	analogValue = analogRead(ANALOG_PIN);
+	Serial.print("ADC value on Pin(0) is ");
+	Serial.println(analogValue);
+	delay(1000);
 }
