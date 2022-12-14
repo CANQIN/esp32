@@ -10,8 +10,12 @@ void setup()
 int recData;
 void loop()
 {
-	// put your main code here, to run repeatedly:
-	Serial.print("纪灿钦！");
-	Serial.println("This is a uart0 demo!"); // 打印并换行
-	delay(1000);
+	// 收到什么发送什么
+	if (Serial.available())
+	{
+		// 读取一个字节
+		recData = Serial.read();
+		Serial.print("received: ");
+		Serial.println(recData, HEX);
+	}
 }
