@@ -1,28 +1,36 @@
-/*5.PWM实验*/
+/*6.定时器实验*/
 #include <Arduino.h>
 
 #define LED_GPIO 2
-#define PWM1_CHANNEL 0
-#define PWM1_RES 10		//分辨率
-#define PWM1_FREQ 1000	//频率
+
+hw_timer_t *timer = NULL;
+bool ledStates;
+
+void Timer0_Interrupt()
+{
+	ledStates = !ledStates;
+	digitalWrite(LED_GPIO, ledStates);
+}
 
 void setup()
 {
-	ledcAttachPin(LED_GPIO,PWM1_CHANNEL);
-	ledcSetup(PWM1_CHANNEL,PWM1_FREQ,PWM1_RES);
+	Serial.begin(115200);
+	pinMode(LED_GPIO, OUTPUT);
+
+	/* 使用定时器0，1/(80MHZ/80) = 1us ，周期为1us */
+	timer = timerBegin(0, 80, true);
+
+	/* 中断回调函数为Timer0_Interrupt */
+	timerAttachInterrupt(timer, &Timer0_Interrupt, true);
+
+	/* 计数Count为1000000，也就是1秒中断一次，重复计数 */
+	timerAlarmWrite(timer, 1000000, true);
+
+	/* 启动定时器*/
+	timerAlarmEnable(timer);
+	Serial.println("timer0 start");
 }
 
-int pwm1DutyCycle;
 void loop()
 {
-	while(pwm1DutyCycle < 1023)
-	{
-		ledcWrite(PWM1_CHANNEL,pwm1DutyCycle++);
-		delay(1);
-	}
-	while(pwm1DutyCycle > 0)
-	{
-		ledcWrite(PWM1_CHANNEL,pwm1DutyCycle--);
-		delay(1);
-	}
 }
