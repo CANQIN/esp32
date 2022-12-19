@@ -1,34 +1,38 @@
-/*6.定时器实验*/
+/*7.EEPROM实验*/
 #include <Arduino.h>
-
-#define LED_GPIO 2
-
-hw_timer_t *timer = NULL;
-bool ledStates;
-
-void Timer0_Interrupt()
-{
-	ledStates = !ledStates;
-	digitalWrite(LED_GPIO, ledStates);
-}
+#include <EEPROM.h>
 
 void setup()
 {
 	Serial.begin(115200);
-	pinMode(LED_GPIO, OUTPUT);
+	Serial.println("");
 
-	/* 使用定时器0，1/(80MHZ/80) = 1us ，周期为1us */
-	timer = timerBegin(0, 80, true);
+	EEPROM.begin(4096); // 申请4096个字节的EEPROM存储空间
+	// 写数据
+	Serial.println("write begin");
+	for (int addr = 0; addr < 4096; addr++)
+	{
+		int data = addr % 256;	  // EEPROM写入的数据时以字节为单位的
+		EEPROM.write(addr, data); // 写入数据
+	}
+	EEPROM.commit(); // 保存更改的数据
+	Serial.println("write done");
 
-	/* 中断回调函数为Timer0_Interrupt */
-	timerAttachInterrupt(timer, &Timer0_Interrupt, true);
+	// 读数据
+	Serial.println("read begin");
+	for (int addr = 0; addr < 4096; addr++)
+	{
+		int data = EEPROM.read(addr); // 读数据
+		Serial.print(data);
+		Serial.print(" ");
+		delay(2);
+		if ((addr + 1) % 256 == 0) // 每行显示256个数据
+		{
+			Serial.println("");
+		}
+	}
 
-	/* 计数Count为1000000，也就是1秒中断一次，重复计数 */
-	timerAlarmWrite(timer, 1000000, true);
-
-	/* 启动定时器*/
-	timerAlarmEnable(timer);
-	Serial.println("timer0 start");
+	Serial.println("read done");
 }
 
 void loop()
